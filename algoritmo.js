@@ -6,8 +6,9 @@ let vidrio;
 let plastico;
 let reciclajeTotal;
 let recompensa;
-let noReciclable = 0
-let hogaresRecompensados = 0
+let noReciclable = 0;
+let totalReciclajeComunidad = 0;
+let hogaresRecompensados = 0;
 
 
 //FUNCION REGISTRO DE CASAS 
@@ -59,8 +60,8 @@ const registrarCasas = (cantidadCasas)=>{
         //SUMAR RECICLAJE TOTAL
         reciclajeTotal = papel + plastico + vidrio;
         
-        //mensaje de recompensa
-        recompensa = determinarRecompensa()
+        //MENSAJE DE  RECOMPENSA
+        recompensa = determinarRecompensa();
 
         //REGISTRAR LA CASA 
         let casa = {
@@ -69,13 +70,13 @@ const registrarCasas = (cantidadCasas)=>{
             vidrio : vidrio,
             reciclajeTotal: reciclajeTotal,
             recompensa : recompensa
-        }
+        };
 
         //ADICIONAR CASA A ARRAY CASAS
         casas.push(casa);
     }
 
-    return casas
+    return casas;
 
 }
 
@@ -87,19 +88,20 @@ const clasificarMateriales = (material) =>{
     let estadoMaterial = prompt(`el material esta:
         1. Reciclable
         2. No Reciclable
-        3.Con Condiciones (sucio,mezclado)`)
+        3.Con Condiciones (sucio,mezclado)`);
 
         //VERIFICAR RESPUESTA
 
     if (estadoMaterial == "1" || estadoMaterial == "3"){
         material = material;
+        totalReciclajeComunidad += material;
     } else {
         noReciclable  += material;
 
-        material = 0
+        material = 0;
     }
     //RETURNAR MATERIAL
-    return material
+    return material;
 }
 
 
@@ -108,21 +110,48 @@ const determinarRecompensa = () =>{
 
         //VERIFICAR MINIMO PARA REALIZAR DESUENTO
         if(reciclajeTotal > 50 ){
-            recompensa = 3
+            recompensa = 3;
             alert (`Felicidades has recibido ${recompensa} cupones de recompensa`)
             hogaresRecompensados += 1;
 
         } else{
-            recompensa = 0
+            recompensa = 0;
         }
 
-        return recompensa
+        return recompensa;
     };
 
+const generarInforme = ()=>{
 
-let hogares = parseInt(prompt("cuantas hogares vas a registar?: "))
+    let hogarMayorReciclaje = casas.reduce((max, casa)=>
+        casa.reciclajeTotal > max.reciclajeTotal? casa : max, casas[0]);
+
+    let hogarMenorReciclaje = casas.reduce((min, casa)=>
+        casa.reciclajeTotal < min.reciclajeTotal? casa : min, casas[0]);
+
+    let indiceMax = casas.findIndex(casa => casa === hogarMayorReciclaje);
+    let indiceMin = casas.findIndex(casa => casa === hogarMenorReciclaje);
+
+    let recompensas = casas.map((casa, index) => {
+        return `La casa ${index + 1} tiene una recompensa de ${casa.recompensa} cupones \n`;
+    }).join('<br/>');
+
+    return `<br> INFORME COMUNIDAD <br/> 
+            ----------------------------
+            Total Reciclaje comunidad: ${totalReciclajeComunidad} KG
+            hogar mayor reciclaje: la casa con mayor reciclaje es la casa ${indiceMax + 1} con ${hogarMayorReciclaje.reciclajeTotal} KG
+            hogar menor reciclaje: la casa con menor reciclaje es la casa ${indiceMin + 1} con ${hogarMenorReciclaje.reciclajeTotal} KG 
+            recompensa por hogar: 
+            ${recompensas}`;
+}
+
+
+
+let hogares = parseInt(prompt("cuantos hogares deseas registar?: "))
 
 registrarCasas(hogares);
 
-console.log(casas)
-console.log(noReciclable)
+console.log(casas);
+console.log(noReciclable);
+
+console.log(generarInforme());
