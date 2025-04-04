@@ -1,157 +1,98 @@
+const numCasa = document.querySelector(".num__casa");
+const cantPapel = document.querySelector(".papel");
+const cantVidiro = document.querySelector(".vidrio");
+const cantPlastico = document.querySelector(".plastico");
+const estadoMaterial = document.querySelectorAll(".estado");
+const btnRegistrar = document.querySelector(".registrar");
+const btninforme = document.querySelector(".informe");
 
-//DECLARACION DE VARIABLES
 let casas = [];
 let papel;
-let vidrio;
 let plastico;
+let vidrio;
 let reciclajeTotal;
-let recompensa;
-let noReciclable = 0;
-let totalReciclajeComunidad = 0;
+let promociones;
+let totalNoReciclaje = 0;
+let reciclajeComunidad = 0;
 let hogaresRecompensados = 0;
+let casaActualIndex = 0;
+let totalCasas = parseInt(prompt("¿cuantas casas hay en la comunidad?"));
 
 
-//FUNCION REGISTRO DE CASAS 
-const registrarCasas = (cantidadCasas)=>{
+btnRegistrar.addEventListener("click", () => {
 
-    //SE INICIA UN BUCLE CON EL PARAMETRO SOLICITADO
-    for (let i = 0; i < cantidadCasas; i++){
+    let registro = registrarCasa();
 
-    //SE INICIA OTRO BUCLE PARA MANEJO DE ERRORES
-    do {
+    if(registro && casaActualIndex < totalCasas){
         
-        //SE SOLICITA CANTIDAD DE MATERIAL
-        papel = parseFloat(prompt(`casa ${i + 1}: ingrese la cantidad de papel en KG`));
-        
-        //VERFICAR VALORES INGRESADOS
-        if (papel > 1000 || papel < 0 || isNaN(papel)){
-            alert("!VALORES NO VALIDOS¡")
-        }
+        casaActualIndex++;
 
-    } while (papel > 1000 || papel < 0 || isNaN(papel));
-    //CLASIFICAR MATERIAL
-    papel = clasificarMateriales(papel);
-        
-    
+        numCasa.textContent = `Formulario Casa ${casaActualIndex + 1}`;
 
-    do {
+        cantPapel.value = "";
+        cantVidiro.value = "";
+        cantPlastico.value = "";
 
-        plastico = parseFloat(prompt(`casa ${i + 1}: ingrese la cantidad de plastico en KG`));
-        
-        if (plastico > 1000 || plastico < 0 || isNaN(plastico)){
-            alert("!VALORES NO VALIDOS¡")
-        }
-
-    } while (plastico > 1000 || plastico < 0 || isNaN(plastico));
-    plastico = clasificarMateriales(plastico);
-    
-
-    do {
-
-        vidrio = parseFloat(prompt(`casa ${i + 1}: ingrese la cantidad de vidrio en KG`));
-        
-        if (vidrio > 1000 || vidrio < 0 || isNaN(vidrio)){
-            alert("!VALORES NO VALIDOS¡")
-        }
-
-    } while (vidrio > 1000 || vidrio < 0 || isNaN(vidrio));
-    vidrio = clasificarMateriales(vidrio);
-        
-        //SUMAR RECICLAJE TOTAL
-        reciclajeTotal = papel + plastico + vidrio;
-        
-        //MENSAJE DE  RECOMPENSA
-        recompensa = determinarRecompensa();
-
-        //REGISTRAR LA CASA 
-        let casa = {
-            papel:papel,
-            platico : plastico,
-            vidrio : vidrio,
-            reciclajeTotal: reciclajeTotal,
-            recompensa : recompensa
-        };
-
-        //ADICIONAR CASA A ARRAY CASAS
-        casas.push(casa);
+    }else if (!registro){
+        alert("Por favor, corrige los datos antes de continuar.");
     }
 
-    return casas;
+    else{
 
-}
-
-
-//FUNCION PARA  CLASIFICAR MATERIALES
-const clasificarMateriales = (material) =>{
-
-    //PREGUNTAR ESTADO DE MATERIALES
-    let estadoMaterial = prompt(`el material esta:
-        1. Reciclable
-        2. No Reciclable
-        3.Con Condiciones (sucio,mezclado)`);
-
-        //VERIFICAR RESPUESTA
-
-    if (estadoMaterial == "1" || estadoMaterial == "3"){
-        material = material;
-        totalReciclajeComunidad += material;
-    } else {
-        noReciclable  += material;
-
-        material = 0;
+        alert("No hay más casas por registrar");
     }
-    //RETURNAR MATERIAL
-    return material;
+
+})
+
+
+
+const registrarCasa = () => {
+
+    let validacion = validarDatos();
+
+    if (validacion) {
+
+        papel = parseFloat(cantPapel.value);
+        plastico = parseFloat(cantPlastico.value);
+        vidrio = parseFloat(cantVidiro.value);  
+
+    reciclajeTotal = papel + plastico + vidrio;
+    reciclajeComunidad += reciclajeTotal;   
+
+    let casa = {
+        papel: papel,
+        plastico: plastico,
+        vidrio: vidrio,
+        reciclajeTotal: reciclajeTotal
+    }
+
+    casas.push(casa);
+
+    alert("Casa registrada correctamente.");
+
+    return true
+    } 
+
+    return false;
 }
 
+const validarDatos = () => {
+    if (cantPapel.value === "" || cantVidiro.value === "" || cantPlastico.value === "") {
+        alert("Por favor, completa todos los campos.");
+        return false;
+    }
 
-//FUNCIOR PARA DETERMINAR HOGARES RECOMPENSADOS
-const determinarRecompensa = () =>{
+    if (isNaN(cantPapel.value) || isNaN(cantVidiro.value) || isNaN(cantPlastico.value)) {
+        alert("Por favor, ingresa valores numéricos válidos.");
+        return false;
+    }
 
-        //VERIFICAR MINIMO PARA REALIZAR DESUENTO
-        if(reciclajeTotal > 50 ){
-            recompensa = 3;
-            alert (`Felicidades has recibido ${recompensa} cupones de recompensa`)
-            hogaresRecompensados += 1;
-
-        } else{
-            recompensa = 0;
-        }
-
-        return recompensa;
-    };
-
-const generarInforme = ()=>{
-
-    let hogarMayorReciclaje = casas.reduce((max, casa)=>
-        casa.reciclajeTotal > max.reciclajeTotal? casa : max, casas[0]);
-
-    let hogarMenorReciclaje = casas.reduce((min, casa)=>
-        casa.reciclajeTotal < min.reciclajeTotal? casa : min, casas[0]);
-
-    let indiceMax = casas.findIndex(casa => casa === hogarMayorReciclaje);
-    let indiceMin = casas.findIndex(casa => casa === hogarMenorReciclaje);
-
-    let recompensas = casas.map((casa, index) => {
-        return `La casa ${index + 1} tiene una recompensa de ${casa.recompensa} cupones \n`;
-    }).join('<br/>');
-
-    return `<br> INFORME COMUNIDAD <br/> 
-            ----------------------------
-            Total Reciclaje comunidad: ${totalReciclajeComunidad} KG
-            hogar mayor reciclaje: la casa con mayor reciclaje es la casa ${indiceMax + 1} con ${hogarMayorReciclaje.reciclajeTotal} KG
-            hogar menor reciclaje: la casa con menor reciclaje es la casa ${indiceMin + 1} con ${hogarMenorReciclaje.reciclajeTotal} KG 
-            recompensa por hogar: 
-            ${recompensas}`;
+    if (parseFloat(cantPapel.value) < 0 || parseFloat(cantVidiro.value) < 0 || parseFloat(cantPlastico.value) < 0) {
+        alert("Los valores no pueden ser negativos.");
+        return false;
+    }
+    return true;
 }
 
-
-
-let hogares = parseInt(prompt("cuantos hogares deseas registar?: "))
-
-registrarCasas(hogares);
 
 console.log(casas);
-console.log(noReciclable);
-
-console.log(generarInforme());

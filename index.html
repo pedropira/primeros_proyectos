@@ -3,10 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+    <title>Sistema de Reciclaje</title>
 </head>
 <body>
-    
+    <div class="formulario__registro">
+        <h1 class="num__casa">Formulario casa 1</h1>
+        <form class="formulario">
+            <label for="papel"class="cant__papel">Cantidad de Papel en kg</label>
+            <input class= "papel" type="text" placeholder="Papel en kg" id="papel">
+            <div class="estado__material"> 
+                <label class="select"> Estado Material
+                <select name="type-of-user" class="estado">
+                    <option value="Reciclable">Reciclable</option>
+                    <option value="No Reciclable">No Reciclable</option>
+                    <option value="Con Condiciones">Con Condiciones (sucio o mezclado)</option>
+                </select>
+                </label>
+            </div>
+            <label for=" plastico" class="cant__plastico">Cantidad de Plastico en kg</label>
+            <input class= "plastico" type="text" placeholder="Plastico en kg" id="plastico">
+            <div class="estado__material"> 
+                <label class="select"> Estado Material
+                <select name="type-of-user" class="estado">
+                    <option value="Reciclable">Reciclable</option>
+                    <option value="No Reciclable">No Reciclable</option>
+                    <option value="Con Condiciones">Con Condiciones (sucio o mezclado)</option>
+                </select>
+                </label>
+            </div>
+            <label for="vidrio" class="cant__vidrio">Cantidad de Vidrio en kg</label>
+            <input class= "vidrio " type="text" placeholder="Vidrio en kg" id="vidrio">
+            <div class="estado__material"> 
+                <label class="select"> Estado Material
+                <select name="type-of-user" class="estado">
+                    <option value="Reciclable">Reciclable</option>
+                    <option value="No Reciclable">No Reciclable</option>
+                    <option value="Con Condiciones">Con Condiciones (sucio o mezclado)</option>
+                </select>
+                </label>
+            </div>
+        </form>
+        <div class="buttons">
+            <button class="registrar" type="button"> Registrar </button>
+            <button class="informe" type="button"> Generar informe </button>
+        </div>
+    </div>
     <script src="algoritmo.js"></script>
 </body>
 </html>

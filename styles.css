@@ -1,0 +1,106 @@
+*{
+    margin: 0;
+    padding: 0;
+    --background-primary: #4CAF50; /* Green for recycling */
+    --background-secondary: #8BC34A; /* Lighter green */
+    --background-accent: #FFC107; /* Yellow for attention */
+    --background-neutral: #FFFFFF; /* White for clean design */
+    --background-dark: #2E7D32; /* Dark green for contrast */
+    font-family: Arial, Helvetica, sans-serif;
+
+}
+
+body{
+    background-color: var(--background-dark);
+    display: grid;
+    place-items: center;
+    color: var(--background-neutral);
+}
+
+.formulario__registro{
+    background-color: var(--background-secondary);
+    margin: 50px auto;
+    padding: 10px;
+    width: 70dvw;
+    max-width: 90dvh;
+    height: 80dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 30px;
+    box-shadow: 4px 6px 6px var(--background-accent);
+}
+
+h1{
+    font-size: 2.5em;
+    margin: 15px;
+    margin-top: 25px;
+}
+
+.formulario{
+    background-color: var(--background-primary);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 10px;
+    width: 70%;
+    height: 70%;
+    font-size: 1.1rem;
+    border-radius: 20px;
+}
+
+
+input{
+    padding: 10px;
+    margin: 1px;
+    margin-top: 0;
+    border: 1px solid #fff;
+    background-color: transparent;
+    border-radius: 16px;
+}
+input::placeholder{
+    color: #fff;
+}
+
+input:focus{
+    border-color: #fff;
+    color:#fff;
+}
+input:focus-visible{
+    outline: none;
+}
+
+.select{
+    font-size:13px ;
+    color: var(--background-accent);
+}
+
+select{
+    font-size: 15px;
+    color: var(--background-accent);
+    background-color: transparent;
+    border: 1px solid var(--background-accent);
+    border-radius: 10px;
+}
+
+.buttons{
+    width: 80%;
+    display: flex;
+    justify-content: space-evenly;
+    margin: 20px;
+}
+
+button{
+    padding: 10px;
+    background-color: #FFC107;
+    border: none;
+    border-radius: 20px;
+    color: #2E7D32;
+    margin-bottom: 20px;
+}
+
+
+
+
+
