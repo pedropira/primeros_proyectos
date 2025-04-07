@@ -11,6 +11,8 @@ const cerrarModal = document.querySelector(".btn__cerrar");
 
 //DECLARAMOS VARIABLES GLOBALES
 let casas = [];
+let semanas = [];
+let semanaActualIndex = 0;
 let papel;
 let plastico;
 let vidrio;
@@ -21,6 +23,7 @@ let reciclajeComunidad = 0;
 let hogaresRecompensados = 0;
 let casaActualIndex = 0;
 let totalCasas = parseInt(prompt("¿cuantas casas hay en la comunidad?"));
+let cantSemanas = parseInt(prompt("¿cuantas semanas se registraran?"));
 
 //FUNCION PARA REGISTRAR LOS DATOS DE CADA CASA
 const registrarCasa = () => {
@@ -180,94 +183,123 @@ const reemplazarInputPorDiv = (inputElement, mensaje) => { // SELECCIONAMOS EL I
 
 };
 
+const guardarSemana = () => {
+    // Creamos un objeto para la semana actual
+    let semana = {
+        numero: semanaActualIndex + 1,
+        casas: [...casas], // Copiamos los datos de las casas registradas
+        reciclajeTotal: reciclajeComunidad,
+        noReciclajeTotal: totalNoReciclaje,
+        hogaresRecompensados: hogaresRecompensados
+    };
+
+    // Agregamos la semana al array de semanas
+    semanas.push(semana);
+
+    // Reiniciamos los datos globales para la siguiente semana
+    casas = [];
+    reciclajeComunidad = 0;
+    totalNoReciclaje = 0;
+    hogaresRecompensados = 0;
+
+    alert(`Datos de la semana ${semana.numero} guardados correctamente.`);
+};
+
 //INICIO DE REGISTRO A DAR CLICK EN EL BOTON REGISTRAR
 btnRegistrar.addEventListener("click", () => {
-
-    //VALIDAMOS FUNCION DE REGISTRO DE CASA
+    // Validamos la función de registro de casa
     let registro = registrarCasa();
     validacionCantidad();
 
-    //VERIFICAMOS SI EL REGISTRO FUE EXITOSO Y SI HAY MAS CASAS POR REGISTRAR
-    if(registro && casaActualIndex + 1 < totalCasas){
-        
-        //VERIFICAMOS SI HAY MAS CASAS POR REGISTRAR
+    // Verificamos si el registro fue exitoso y si hay más casas por registrar en la semana actual
+    if (registro && casaActualIndex + 1 < totalCasas) {
         casaActualIndex++;
 
-        //CAMBIAMOS EL NUMERO DE CASA EN EL HTML Y VALORES DE LOS INPUTS
-        numCasa.textContent = `Formulario Casa ${casaActualIndex + 1}`;
-
+        // Cambiamos el número de casa en el HTML y valores de los inputs
+        numCasa.textContent = `Formulario Casa ${casaActualIndex + 1} semana ${semanaActualIndex + 1}`;
         cantPapel.value = "";
         cantVidiro.value = "";
         cantPlastico.value = "";
 
-        
-    //MENSAJE DE ERROR EN CASO
-    }else if (!registro){
+    } else if (!registro) {
         alert("Por favor, corrige los datos antes de continuar.");
+    } else {
+        // Guardamos los datos de la semana actual
+        guardarSemana();
+
+        // Verificamos si hay más semanas por registrar
+        if (semanaActualIndex + 1 < cantSemanas) {
+            semanaActualIndex++;
+            casaActualIndex = 0; // Reiniciamos el índice de casas para la nueva semana
+            alert(`Iniciando registro de la semana ${semanaActualIndex + 1}`);
+            numCasa.textContent = `Formulario Casa ${casaActualIndex + 1} semana ${semanaActualIndex + 1}`;
+            cantPapel.value = "";
+            cantVidiro.value = "";
+            cantPlastico.value = "";
+        } else {
+            alert("No hay más semanas por registrar.");
+            btninforme.click(); // Generar el informe al finalizar
+        }
     }
-    
-    //MENSAJE EN CASO DE ACABAR CASAS A REGISTRAR
-    else{
-        alert("No hay más casas por registrar");
-        cantPapel.value = "";
-        cantVidiro.value = "";
-        cantPlastico.value = "";
-        btninforme.click();
-    };
 });
 
 btninforme.addEventListener("click", () => {
-    //ENCONTRAMOS LAS CASAS CON MAYOR Y MENOR RECICLAJE
-    let casaMayorReciclaje = casas.reduce((max, casa)=> casa.reciclajeTotal > max.reciclajeTotal? casa : max, casas[0]);
-    let casaMenorReciclaje = casas.reduce((min, casa)=> casa.reciclajeTotal < min.reciclajeTotal? casa : min, casas[0]);
-
-    //ENCONTRAMOS LOS INDICES DE LAS CASAS CON MAYOR Y MENOR RECICLAJE
-    let indiceCasaMayorReciclaje = casas.indexOf(casaMayorReciclaje);
-    let indiceCasaMenorReciclaje = casas.indexOf(casaMenorReciclaje);
-
-
-    //VALIDAMOS QUE HAYA CASAS REGISTRADAS
-    if (casas.length === 0) {
-        alert("No hay casas registradas.");
+    if (semanas.length === 0) {
+        alert("No hay semanas registradas.");
         return;
-    };
+    }
 
-    //MOSTRAMOS UN INFORME CON LOS DATOS DE CADA CASA
-    let informe = "<h3>Informe de reciclaje por casa:</h3>";
-    casas.forEach((casa, index) => {
+    // Generamos el informe
+    let informe = "<h3>Informe de reciclaje por semanas:</h3>";
+    semanas.forEach((semana) => {
+
+        // Encontrar el índice de la casa con mayor y menor reciclaje
+        let maxReciclaje = Math.max(...semana.casas.map(casa => casa.reciclajeTotal));
+        let minReciclaje = Math.min(...semana.casas.map(casa => casa.reciclajeTotal));
+        let casaMaxIndex = semana.casas.findIndex(casa => casa.reciclajeTotal === maxReciclaje) + 1;
+        let casaMinIndex = semana.casas.findIndex(casa => casa.reciclajeTotal === minReciclaje) + 1;
+
+        semana.casas.forEach((casa, index) => {
+    informe += `<h4>Semana ${semana.numero}:</h4>
+                1<h5>Casas registradas:</h5>
+        <div>
+            <h6>Casa ${index + 1}:</h6>
+            <p>Papel: ${casa.papel}kg</p>
+            <p>Plástico: ${casa.plastico}kg</p>
+            <p>Vidrio: ${casa.vidrio}kg</p>
+            <p>Reciclaje Total: ${casa.reciclajeTotal}kg</p>
+            <p>Promociones: ${casa.promociones}</p>
+        </div>
+    `;
+});
+
         informe += `
-            <div>
-                <h4>Casa ${index + 1}:</h4>
-                <p>Papel: ${casa.papel}kg</p>
-                <p>Plástico: ${casa.plastico}kg</p>
-                <p>Vidrio: ${casa.vidrio}kg</p>
-                <p>Reciclaje Total: ${casa.reciclajeTotal}kg</p>
-                <p>Promociones: ${casa.promociones}</p>
-                <hr>
-            </div>
+                <p>Total de reciclaje: ${semana.reciclajeTotal}kg</p>
+                <p>Total de no reciclaje: ${semana.noReciclajeTotal}kg</p>
+                <p>Hogares recompensados: ${semana.hogaresRecompensados}</p>
+                
         `;
-    });
 
-    informe += `<h3>Resumen de la comunidad:</h3>
-        <p>Total de reciclaje en la comunidad: ${reciclajeComunidad}kg</p>
-        <p>Total de no reciclaje en la comunidad: ${totalNoReciclaje}kg</p>
-        <p>Hogares recompensados: ${hogaresRecompensados}</p>
-        <p>Casa con mayor reciclaje: Casa ${indiceCasaMayorReciclaje + 1} con ${casaMayorReciclaje.reciclajeTotal}kg</p>
-        <p>Casa con menor reciclaje: Casa ${indiceCasaMenorReciclaje + 1} con ${casaMenorReciclaje.reciclajeTotal}kg</p>
+        informe += `
+        <p>Casa con mayor reciclaje: Casa ${casaMaxIndex} (${maxReciclaje}kg)</p>
+        <p>Casa con menor reciclaje: Casa ${casaMinIndex} (${minReciclaje}kg)</p>
     `;
 
+
+
+        informe += "<hr></div>";
+    });
+
     const informeDiv = document.querySelector(".mensaje");
-    informeDiv.innerHTML= informe;
-    modal.style.display = "block"; 
-    modal.style.animation = "aparecer 0.7s forwards";// Mostrar el informe
+    informeDiv.innerHTML = informe;
+    modal.style.display = "block";
+    modal.style.animation = "aparecer 0.7s forwards"; // Mostrar el informe
 });
 
 cerrarModal.addEventListener("click", () => {
-    modal.style.display = "none";
-    modal.style.animation = "cerrar 0.7s forwards";
+    modal.style.display = "none"; // Ocultar el modal
+    modal.style.animation = "cerrar 0.7s forwards"; // Reiniciar la animación
 })
-
-
 
 
 
