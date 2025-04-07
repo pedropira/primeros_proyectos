@@ -130,15 +130,22 @@ button{
     top: 0;
     left: 0;
     display: none;
+    overflow-y: auto; /* Habilitar desplazamiento vertical */
+    overflow-x: hidden; /* Evitar desplazamiento horizontal */
 }
 
-.informe{
+.informe {
     background-color: #fff;
     color: #000;
-    width: 500px;
-    margin:  60px auto;
+    width: 90%; /* Ajustar al 90% del ancho de la pantalla */
+    max-width: 500px; /* Ancho máximo */
+    max-height: 80vh; /* Altura máxima del 80% de la ventana */
+    margin: 60px auto 40px;
     padding: 30px;
-    text-align: center;
+    text-align: left;
+    overflow-y: auto; /* Habilitar desplazamiento interno */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Sombra para destacar */
 }
 
 .btn__cerrar{
