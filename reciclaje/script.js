@@ -32,9 +32,9 @@ const registrarCasa = () => {
     if (validacion) {
 
         //OBTENEMOS LOS VALORES DE CADA MATERIAL
-        papel = parseFloat(cantPapel.value);
-        plastico = parseFloat(cantPlastico.value);
-        vidrio = parseFloat(cantVidiro.value);  
+        papel = cantPapel.disabled ? 0 : parseFloat(cantPapel.value);
+        plastico = cantPlastico.disabled ? 0 : parseFloat(cantPlastico.value);
+        vidrio = cantVidiro.disabled ? 0 : parseFloat(cantVidiro.value);
         
         //CLASIFICAMOS CADA MATERIAL SEGUN SU ESTADO
         papel = clasificarMaterial(cantPapel, papel);
@@ -84,25 +84,29 @@ const registrarCasa = () => {
 
 //FUNCIONES PARA VALIDAR LOS DATOS INGRESADOS EN LOS INPUTS
 const validarDatos = () => {
-
-    //VALIDAMOS QUE LOS CAMPOS NO ESTEN VACIOS
-    if (cantPapel.value === "" || cantVidiro.value === "" || cantPlastico.value === "") {
-        alert("Por favor, completa todos los campos.");
-        return false;
-    };
+    if(!cantPapel || cantPapel.disabled || !cantVidiro || cantVidiro.disabled || !cantPlastico || cantPlastico.disabled) {
+        // si no existe o está disabled, lo ignoramos (ya no hay que validarlo)
+        return true;
+    } else {
+        if (cantPapel.value === "" || cantVidiro.value === "" || cantPlastico.value === "") {
+            alert("Por favor, completa todos los campos.");
+            return false;
+        };
+        if(!cantPapel || cantPapel.disabled) {
+            // si no existe o está disabled, lo ignoramos (ya no hay que validarlo)
+            return true;
+        } else if (isNaN(cantPapel.value) || isNaN(cantVidiro.value) || isNaN(cantPlastico.value)) {
+            alert("Por favor, ingresa valores numéricos válidos.");
+            return false;
+        };
+        
+        //VALIDAMOS QUE LOS CAMPOS NO SEAN NEGATIVOS
+        if (parseFloat(cantPapel.value) < 0 || parseFloat(cantVidiro.value) < 0 || parseFloat(cantPlastico.value) < 0) {
+            alert("Los valores no pueden ser negativos.");
+            return false;
+        };
+    } 
     
-    //VALIDAMOS QUE LOS CAMPOS SEAN NUMERICOS
-    if (isNaN(cantPapel.value) || isNaN(cantVidiro.value) || isNaN(cantPlastico.value)) {
-        alert("Por favor, ingresa valores numéricos válidos.");
-        return false;
-    };
-    
-    //VALIDAMOS QUE LOS CAMPOS NO SEAN NEGATIVOS
-    if (parseFloat(cantPapel.value) < 0 || parseFloat(cantVidiro.value) < 0 || parseFloat(cantPlastico.value) < 0) {
-        alert("Los valores no pueden ser negativos.");
-        return false;
-    };
-
     return true;
 };
 
@@ -146,41 +150,70 @@ const validacionCantidad = () => {
     })
 
     // VERIFICAMOS SI EL TOTAL DE CADA MATERIAL SUPERA EL LIMITE
-    if (totalPapel >= 1000) {
+    if (totalPapel >= 1000 ) {
         alert("El papel ya está en su máximo.");
         // REEMPLAZAMOS EL INPUT POR UN DIV CON UN MENSAJE
         reemplazarInputPorDiv(cantPapel, "Papel máximo alcanzado");
+        return false;
+
     };
     
     //REPETIMOS PROCESO PARA VIDRIO
     if (totalVidrio >= 1000) {
         alert("El vidrio ya está en su máximo.");
         reemplazarInputPorDiv(cantVidiro, "Vidrio máximo alcanzado");
+        return false;
     };
     
     //REPETIMOS PROCESO PARA PLASTICO
     if (totalPlastico >= 1000) {
         alert("El plástico ya está en su máximo.");
         reemplazarInputPorDiv(cantPlastico, "Plástico máximo alcanzado");
+        return false;
     };
+
+    if(totalPapel >= 1000 && totalVidrio >= 1000 && totalPlastico >= 1000) {
+
+        semanaActualIndex++;
+        casaActualIndex = 0; // Reiniciamos el índice de casas para la nueva semana
+            alert(`Iniciando registro de la semana ${semanaActualIndex + 1}`);
+            numCasa.textContent = `Formulario Casa ${casaActualIndex + 1} semana ${semanaActualIndex + 1}`;
+            cantPapel.value = "";
+            cantVidiro.value = "";
+            cantPlastico.value = "";
+
+            cantPapel.disabled    = false;
+            cantVidiro.disabled    = false;
+            cantPlastico.disabled  = false;
+            cantPapel.classList.remove("bloqueado, material__maximo");
+            cantVidiro.classList.remove("bloqueado, material__maximo"); 
+            cantPlastico.classList.remove("bloqueado, material__maximo");
+
+            const selectPapel = cantPapel.parentNode.querySelector("select.estado");
+            if (selectPapel) select.style.display = "block";
+            const selectVidrio = cantVidiro.parentNode.querySelector("select.estado");
+            if (selectVidrio) select.style.display = "block";
+            const selectPlastico = cantPlastico.parentNode.querySelector("select.estado");
+            if (selectPlastico) select.style.display = "block"; // Mostrar el select nuevamente
+        return false; 
+    }
+
+    return true;
 };
 
 //FUNCION PARA REEMPLAZAR EL INPUT POR UN DIV CON UN MENSAJE
 const reemplazarInputPorDiv = (inputElement, mensaje) => { // SELECCIONAMOS EL INPUT A REEMPLAZAR
 
     //CREAMOS UN DIV Y LO REEMPLAZAMOS POR EL INPUT
-    const div = document.createElement("div");
-    div.textContent = mensaje;
-    div.className = "material-maximo"; 
-    div.classList.add("bloqueado");
-    inputElement.parentNode.replaceChild(div, inputElement);
+    inputElement.value       = "0";
+    inputElement.placeholder = mensaje;
+    inputElement.disabled    = true;
+    inputElement.classList.add("material__maximo","bloqueado");
     
     // OCULTAMOS EL SELECT DEL MATERIAL
-    const selectElement = div.parentNode.querySelector(".estado"); 
-    if (selectElement) {
-        selectElement.style.display = "none"; 
-    };
-
+    const select = inputElement.parentNode.querySelector("select.estado");
+    if (select) select.style.display = "none";
+    return true;
 };
 
 const guardarSemana = () => {
@@ -236,11 +269,27 @@ btnRegistrar.addEventListener("click", () => {
             cantPapel.value = "";
             cantVidiro.value = "";
             cantPlastico.value = "";
+
+            cantPapel.disabled    = false;
+            cantVidiro.disabled    = false;
+            cantPlastico.disabled  = false;
+            cantPapel.classList.remove("bloqueado", "material__maximo");
+            cantVidiro.classList.remove("bloqueado", "material__maximo"); 
+            cantPlastico.classList.remove("bloqueado", "material__maximo");
+
+            const selectPapel = cantPapel.parentNode.querySelector("select.estado");
+            if (selectPapel) selectPapel.style.display = "block";
+            const selectVidrio = cantVidiro.parentNode.querySelector("select.estado");
+            if (selectVidrio) selectVidrio.style.display = "block";
+            const selectPlastico = cantPlastico.parentNode.querySelector("select.estado");
+            if (selectPlastico) selectPlastico.style.display = "block"; // Mostrar el select nuevamente
         } else {
             alert("No hay más semanas por registrar.");
             btninforme.click(); // Generar el informe al finalizar
         }
     }
+
+    console.log(casas)
 });
 
 btninforme.addEventListener("click", () => {
@@ -258,19 +307,18 @@ btninforme.addEventListener("click", () => {
         let minReciclaje = Math.min(...semana.casas.map(casa => casa.reciclajeTotal));
         let casaMaxIndex = semana.casas.findIndex(casa => casa.reciclajeTotal === maxReciclaje) + 1;
         let casaMinIndex = semana.casas.findIndex(casa => casa.reciclajeTotal === minReciclaje) + 1;
-
+        informe += `<h4>Semana ${semana.numero}:</h4>
+        <h5>Casas registradas:</h5>`
         semana.casas.forEach((casa, index) => {
-    informe += `<h4>Semana ${semana.numero}:</h4>
-                1<h5>Casas registradas:</h5>
-        <div>
+            informe +=`<div>
             <h6>Casa ${index + 1}:</h6>
             <p>Papel: ${casa.papel}kg</p>
             <p>Plástico: ${casa.plastico}kg</p>
             <p>Vidrio: ${casa.vidrio}kg</p>
             <p>Reciclaje Total: ${casa.reciclajeTotal}kg</p>
             <p>Promociones: ${casa.promociones}</p>
-        </div>
-    `;
+        </div>`;
+    ;
 });
 
         informe += `
